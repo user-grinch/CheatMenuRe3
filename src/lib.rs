@@ -3,9 +3,9 @@ use hudhook::hooks::dx9::ImguiDx9Hooks;
 use hudhook::reexports::*;
 use hudhook::*;
 
-mod modmenu;
-mod utils;
-use modmenu::CheatMenu;
+mod cheat_menu;
+mod game_mem;
+use cheat_menu::CheatMenu;
 
 #[no_mangle]
 pub unsafe extern "stdcall" fn DllMain( hmodule: HINSTANCE, reason: u32, _: *mut std::ffi::c_void ){

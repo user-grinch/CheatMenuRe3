@@ -1,5 +1,8 @@
 use pdb::FallibleIterator;
 use toy_arms::internal::Module;
+use std::ffi::c_void;
+use windows::Win32::System::Memory::{VirtualProtect, PAGE_PROTECTION_FLAGS, PAGE_EXECUTE_READWRITE};
+
 const EXE_NAME : &str = "re3.exe";
 const PDB_NAME : &str = "re3.pdb";
 
@@ -34,9 +37,37 @@ pub fn get_symbol_addr(sym_name : &str) -> u64 {
     return module.module_base_address as u64 + offset;
 }
 
-pub fn write_mem<T>(address : u64, val : T) {
+pub fn read_mem<T>(address : u64, virtual_protect : bool) -> T  {
     let _ptr: *mut T = address as *mut T;
+    let mut protect = PAGE_PROTECTION_FLAGS(0);
+
     unsafe {
+        if virtual_protect {
+            VirtualProtect(address as *const c_void, 1, PAGE_EXECUTE_READWRITE, &mut protect);
+        }
+    
+        let val : T = std::ptr::read(_ptr);
+    
+        if virtual_protect {
+            VirtualProtect(address as *const c_void, 1, protect, &mut protect);
+        }
+        return val;
+    }
+}
+
+pub fn write_mem<T>(address : u64, val : T, virtual_protect : bool)  {
+    let _ptr: *mut T = address as *mut T;
+    let mut protect = PAGE_PROTECTION_FLAGS(0);
+
+    unsafe {
+        if virtual_protect {
+            VirtualProtect(address as *const c_void, 1, PAGE_EXECUTE_READWRITE, &mut protect);
+        }
+    
         std::ptr::write(_ptr, val);
+    
+        if virtual_protect {
+            VirtualProtect(address as *const c_void, 1, protect, &mut protect);
+        }
     }
 }
