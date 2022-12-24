@@ -8,7 +8,8 @@ crate-type = ["cdylib", "rlib"]
 name = "cheat_menu_re3"
 
 [dependencies]
-hudhook = { version = "0.3.0", features = ["simplelog"]}
+hudhook = { version = "0.3.0"}
+simple-log = "1.6.0"
 imgui = "0.8.2"
 pdb = "0.8.0"
 toy-arms = {version = "0.9.4", features = ["internal", "external"]}
