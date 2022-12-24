@@ -4,9 +4,8 @@ use hudhook::reexports::*;
 use hudhook::*;
 
 mod cheatmenu;
-mod memory;
+mod module;
 mod sdk;
-mod widgets;
 use cheatmenu::CheatMenu;
 
 #[no_mangle]
