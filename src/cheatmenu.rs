@@ -2,21 +2,26 @@ use hudhook::{hooks::{ImguiRenderLoop, ImguiRenderLoopFlags}};
 use imgui::{Condition, Window, Ui, ColorStackToken};
 use toy_arms::VirtualKeyCode;
 use simplelog::*;
-use std::fs::File;
+use std::{fs::File};
 use log::info;
 use chrono::Datelike;
+use crate::page::*;
 
 use crate::module::widgets::{calc_size};
-use crate::module::memory::{get_symbol_addr, write_mem, read_mem, get_struct_from_symbol};
-
-const VERSION_NUMBER :f32 = 0.1;
+use crate::module::memory::{get_symbol_addr, write_mem, read_mem};
+const VERSION_TITLE :&str = "Cheat Menu v0.1-alpha";
 const LOG_NAME :&str = "CheatMenuRe3.log";
+
+pub struct PageInfo {
+    pub name: &'static str,
+    pub func: fn(ui: &Ui),
+}
 
 pub struct CheatMenu
 {
     visible : bool,
-    headers : [String; 3],
-    header_selected : u32,
+    page_list : [&'static PageInfo; 3],
+    page_selected : &'static PageInfo,
 }
 
 impl CheatMenu {
@@ -24,19 +29,17 @@ impl CheatMenu {
 
         // Setup the log
         WriteLogger::init(LevelFilter::Info, Config::default(), File::create(LOG_NAME).unwrap()).unwrap_or_default();
-        info!("Cheat Menu v{}-alpha", VERSION_NUMBER);
+        info!("{}", VERSION_TITLE);
         info!("Copyright (c) 2022-2023, Grinch_");
         info!("Join discord https://discord.gg/ZzW7kmf");
         let date = chrono::Utc::now().date_naive();
         info!("Date: {}-{}-{}", date.day(), date.month(), date.year());
 
         return CheatMenu { 
-                visible: false, 
-                headers: [
-                    "Teleport".to_string(), "Player".to_string(), "Menu".to_string()
-                ],
-                header_selected : 0,
-            }
+            visible: false, 
+            page_list: [teleport::get(), player::get(), menu::get()],
+            page_selected : welcome::get(),
+        }
     }
 
     /*
@@ -44,36 +47,39 @@ impl CheatMenu {
         Stacked buttons on the top 
     */
     pub fn create_pages(&mut self, ui: &Ui) {
-        ui.spacing();
         let spacing = ui.push_style_var(imgui::StyleVar::ItemSpacing([0.0, 0.0]));
         let rounding = ui.push_style_var(imgui::StyleVar::FrameRounding(0.0));
 
-        for i in 0..self.headers.len() {
+        let mut i :u32 = 0;
+        for page in &mut self.page_list {
 
             let colors : ColorStackToken;
 
-            if i == self.header_selected as usize {
+            if page.name == self.page_selected.name {
                 colors = ui.push_style_color(imgui::StyleColor::Button, ui.style_color(imgui::StyleColor::ButtonActive));
             } else {
                 colors  = ui.push_style_color(imgui::StyleColor::Button, ui.style_color(imgui::StyleColor::Button));
             }
 
             let sz = calc_size(ui, 3, false);
-            if ui.button_with_size(self.headers[i].as_str(), [sz[0], sz[1]/1.3]) {
-                self.header_selected = i as u32;
+            if ui.button_with_size(page.name, sz) {
+                self.page_selected = &page;
             }
 
-            if i == self.header_selected as usize {
+            if page.name == self.page_selected.name {
                 colors.pop();
             }
 
             if (i % 3) != 2 {
                 ui.same_line();
             }
+            i += 1;
         }
 
         rounding.pop();
         spacing.pop();
+        ui.dummy([0.0, 10.0]);
+        (self.page_selected.func)(ui);
     }
 
     /*
@@ -123,7 +129,13 @@ impl ImguiRenderLoop for CheatMenu {
     fn initialize(&mut self, _ctx: &mut imgui::Context) {
         let io = _ctx.io_mut();
         io.mouse_draw_cursor = true;
-        
+
+        _ctx.fonts().add_font(&[imgui::FontSource::TtfData {
+            data: include_bytes!("C:/Windows/Fonts/trebucbd.ttf"),
+            size_pixels: 16.0,
+            config: None,
+        }]);
+
         let style = _ctx.style_mut();
         style.tab_border_size = 0.0;
         style.child_border_size = 0.0;
@@ -131,13 +143,13 @@ impl ImguiRenderLoop for CheatMenu {
         style.popup_border_size = 0.0;
         style.window_border_size = 0.0;
 
-        style.window_padding = [8.0, 8.0];
+        style.window_padding = [5.0, 5.0];
         style.window_rounding = 5.0;
-        style.frame_padding = [8.0, 8.0];
+        style.frame_padding = [5.0, 5.0];
         style.frame_rounding = 5.0;
         style.popup_rounding = 5.0;
-        style.item_spacing = [7.0, 7.0];
-        style.item_inner_spacing = [7.0, 7.0];
+        style.item_spacing = [4.0, 4.0];
+        style.item_inner_spacing = [4.0, 4.0];
         style.indent_spacing = 25.0;
         style.scrollbar_size = 12.0;
         style.scrollbar_rounding = 10.0;
@@ -191,7 +203,7 @@ impl ImguiRenderLoop for CheatMenu {
     fn render(&mut self, ui: &mut imgui::Ui, _: &ImguiRenderLoopFlags) {
 
         if self.visible {
-            Window::new("Cheat Menu by Grinch_")
+            Window::new(VERSION_TITLE)
                 .size([350.0, 650.0], Condition::Once)
                 .collapsible(false)
                 // .opened(&mut (self.shown))

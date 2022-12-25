@@ -6,6 +6,7 @@ use hudhook::*;
 mod cheatmenu;
 mod module;
 mod sdk;
+mod page;
 use cheatmenu::CheatMenu;
 
 #[no_mangle]
