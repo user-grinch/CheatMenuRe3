@@ -2,7 +2,8 @@
 #![allow(dead_code)]
 
 use crate::module::memory::{get_symbol_addr, read_mem};
-use crate::sdk::ped;
+
+use super::vector::CVector;
 
 enum WastedBustedState
 {
@@ -87,6 +88,16 @@ impl CPlayerInfo {
 	pub fn get_mut() -> &'static mut CPlayerInfo {
 		let pinfo: &mut CPlayerInfo = unsafe {std::mem::transmute(*CPLAYER_INFO)};
 		pinfo
+	}
+
+	// Retuns player's current position in world
+	pub fn get_pos(&self) -> *mut CVector {
+		let addr = get_symbol_addr("?GetPos@CPlayerInfo@@QEAAAEBVCVector@@XZ");
+        unsafe {
+            type Func = extern "fastcall" fn(&CPlayerInfo) -> *mut CVector;
+            let func: Func = std::mem::transmute(addr); 
+            func(self)
+        }
 	}
 
 	// Returns true if player is in RC Vehicle remote mode
