@@ -16,5 +16,7 @@ pdb = "0.8.0"
 open = "3.2.0"
 chrono = "0.4.23"
 lazy_static = "1.4.0"
+c2rust-bitfields = "0.3.0"
+libc = "0.2.139"
 toy-arms = {version = "0.9.4", features = ["internal", "external"]}
 windows = {version = "0.43.0", features = ["Win32_System_Memory", "Win32_Foundation"]}

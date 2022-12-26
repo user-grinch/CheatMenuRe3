@@ -5,7 +5,7 @@ use simplelog::*;
 use std::{fs::File};
 use log::info;
 use chrono::Datelike;
-use crate::page::*;
+use crate::{page::*, sdk::playerinfo::CPlayerInfo};
 
 use crate::module::widgets::{calc_size};
 use crate::module::memory::{get_symbol_addr, write_mem, read_mem};
@@ -100,15 +100,7 @@ impl CheatMenu {
         }
 
         // Disable controls
-        let addr = get_symbol_addr("?MakePlayerSafe@CPlayerInfo@@QEAAX_N@Z");
-        unsafe {
-            type MakePlayerSafe = extern "fastcall" fn(u64, bool);
-            let func: MakePlayerSafe = std::mem::transmute(addr); 
-            let pinfo = get_symbol_addr("?Players@CWorld@@2PAVCPlayerInfo@@A");
-            if read_mem::<u64>(pinfo, true) != 0 {
-                func(pinfo, self.visible);
-            }
-        }
+       CPlayerInfo::make_player_safe(self.visible);
 
         // // call CPads::Update()
         let addr = get_symbol_addr("?UpdatePads@CPad@@SAXXZ");

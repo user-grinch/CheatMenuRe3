@@ -1,7 +1,9 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 
-use crate::module::memory::get_symbol_addr;
+use crate::module::memory::{get_symbol_addr, read_mem};
+use crate::sdk::ped;
+
 enum WastedBustedState
 {
 	WbstatePlaying,
@@ -17,8 +19,7 @@ type RwTexture = i64;
 type CChar = u8;
 
 #[repr(C)]
-pub struct CPlayerInfo
-{
+pub struct CPlayerInfo {
 	pub m_pPed : *mut CPed,
     pub m_pRemoteVehicle : *mut CVehicle,
 	pub m_ColModel : [u8; 112], // CColModel
@@ -57,13 +58,9 @@ pub struct CPlayerInfo
 	pub m_aSkinName : [CChar; 32],
 	pub m_pSkinTexture : *mut RwTexture,
 
-	// void MakePlayerSafe(bool);
-	// void AwardMoneyForExplosion(CVehicle *vehicle);	
 	// const CVector &GetPos();
-	// void Process(void);
 	// void KillPlayer(void);
 	// void ArrestPlayer(void);
-	// bool IsPlayerInRemoteMode(void);
 	// void PlayerFailedCriticalMission(void);
 	// void Clear(void);
 	// void BlowUpRCBuggy(void);
@@ -90,5 +87,23 @@ impl CPlayerInfo {
 	pub fn get_mut() -> &'static mut CPlayerInfo {
 		let pinfo: &mut CPlayerInfo = unsafe {std::mem::transmute(*CPLAYER_INFO)};
 		pinfo
+	}
+
+	// Returns true if player is in RC Vehicle remote mode
+	pub fn is_player_in_remote_mode(&self) -> bool {
+		self.m_bInRemoteMode
+	}
+
+	// Disables the player control
+	pub fn make_player_safe(flag : bool) {
+		let addr = get_symbol_addr("?MakePlayerSafe@CPlayerInfo@@QEAAX_N@Z");
+        unsafe {
+            type MakePlayerSafe = extern "fastcall" fn(u64, bool);
+            let func: MakePlayerSafe = std::mem::transmute(addr); 
+			let pinfo = get_symbol_addr("?Players@CWorld@@2PAVCPlayerInfo@@A");
+            if read_mem::<u64>(pinfo, true) != 0 {
+                func(pinfo, flag);
+            }
+        }
 	}
 }
