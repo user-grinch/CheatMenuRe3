@@ -1,5 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
+
+use crate::module::memory::get_symbol_addr;
 enum WastedBustedState
 {
 	WbstatePlaying,
@@ -76,4 +78,17 @@ pub struct CPlayerInfo
 	// void LoadPlayerSkin();
 	// void SetPlayerSkin(const char *skin);
 	// void DeletePlayerSkin();
+}
+
+lazy_static! {
+    static ref CPLAYER_INFO: u64 = get_symbol_addr("?Players@CWorld@@2PAVCPlayerInfo@@A");
+}
+
+impl CPlayerInfo {
+
+	// Returns static ref to CPlayerInfo
+	pub fn get_mut() -> &'static mut CPlayerInfo {
+		let pinfo: &mut CPlayerInfo = unsafe {std::mem::transmute(*CPLAYER_INFO)};
+		pinfo
+	}
 }

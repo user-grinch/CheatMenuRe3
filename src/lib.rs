@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate lazy_static;
 use hudhook::hooks::ImguiRenderLoop;
 use hudhook::hooks::dx9::ImguiDx9Hooks;
 use hudhook::reexports::*;
