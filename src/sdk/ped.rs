@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 use c2rust_bitfields::BitfieldStruct;
-use crate::sdk::vector;
 
 use super::vector::CVector;
 

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use crate::module::memory::get_symbol_addr;
-
+use widestring::U16CString;
 pub(crate) struct CHud {
 
 }
@@ -18,28 +18,31 @@ impl CHud {
 	pub fn set_help_message(message: &str, quick: bool) {
         let addr = get_symbol_addr("?SetHelpMessage@CHud@@SAXPEAG_N@Z");
         unsafe {
-            type Func = extern "cdecl" fn(&[u8], bool);
-            let str: String = String::from(message) + "\0";
+            type Func = extern "cdecl" fn(*const u16, bool);
+            let v: Vec<u16> = message.encode_utf16().collect();
+            let msg = U16CString::from_vec_unchecked(v);
             let func: Func = std::mem::transmute(addr); 
-            func(str.as_bytes(), quick);
+            func(msg.as_ptr(), quick);
         }
     }
 	pub fn set_message(message: &str) {
         let addr = get_symbol_addr("?SetMessage@CHud@@SAXPEAG@Z");
         unsafe {
-            type Func = extern "cdecl" fn(&[u8]);
-            let str: String = String::from(message) + "\0";
+            type Func = extern "cdecl" fn(*const u16);
+            let v: Vec<u16> = message.encode_utf16().collect();
+            let msg = U16CString::from_vec_unchecked(v);
             let func: Func = std::mem::transmute(addr); 
-            func(str.as_bytes());
+            func(msg.as_ptr());
         }
     }
 	pub fn set_big_message(message: &str, style: u16) {
         let addr = get_symbol_addr("?SetBigMessage@CHud@@SAXPEAGG@Z");
         unsafe {
-            type Func = extern "cdecl" fn(&[u8], u16);
-            let str: String = String::from(message) + "\0";
+            type Func = extern "cdecl" fn(*const u16, u16);
+            let v: Vec<u16> = message.encode_utf16().collect();
+            let msg = U16CString::from_vec_unchecked(v);
             let func: Func = std::mem::transmute(addr); 
-            func(str.as_bytes(), style);
+            func(msg.as_ptr(), style);
         }
     }
 }

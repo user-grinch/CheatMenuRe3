@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use pdb::FallibleIterator;
 use toy_arms::internal::Module;
 use std::ffi::c_void;

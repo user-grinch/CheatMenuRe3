@@ -28,10 +28,10 @@ fn draw(ui : &Ui) {
             BUF = "".to_string();
         }
         ui.same_line();
-        if ui.button_with_size("Teleport", sz) {
+        if ui.button_with_size("Teleport##Btn", sz) {
             let mut coords : Vec<&str> = BUF.split(", ").collect();
 
-            if coords.len() == 0 {
+            if coords.len() < 3 {
                 coords = BUF.split(",").collect();
             }
 
@@ -47,12 +47,11 @@ fn draw(ui : &Ui) {
                     (*pos).y = temp_y.unwrap();
                     (*pos).z = temp_z.unwrap();
                 } else {
-                    CHud::set_help_message("Invalid coordinages", false);
+                    CHud::set_help_message("Invalid coordinates", false);
                 }
             } else {
-                CHud::set_help_message("Invalid coordinages", false);
+                CHud::set_help_message("Invalid coordinates", false);
             }
-            
         }
     }
 }
