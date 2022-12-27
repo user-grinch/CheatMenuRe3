@@ -195,14 +195,16 @@ impl ImguiRenderLoop for CheatMenu {
     fn render(&mut self, ui: &mut imgui::Ui, _: &ImguiRenderLoopFlags) {
 
         if self.visible {
+            let mut menu_open = self.visible;
             Window::new(VERSION_TITLE)
                 .size([350.0, 650.0], Condition::Once)
                 .collapsible(false)
-                // .opened(&mut (self.shown))
+                .opened(&mut menu_open)
                 .build(ui, || {
                     self.create_pages(ui);
                 }
             );
+            self.visible = menu_open;
         } else {
             ui.set_mouse_cursor(None);
         }
