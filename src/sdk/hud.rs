@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::module::memory::get_symbol_addr;
+use crate::modules::memory::get_symbol_addr;
 use widestring::U16CString;
 pub(crate) struct CHud {
 

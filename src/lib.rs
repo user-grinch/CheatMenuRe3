@@ -6,9 +6,9 @@ use hudhook::reexports::*;
 use hudhook::*;
 
 mod cheatmenu;
-mod module;
+mod modules;
 mod sdk;
-mod page;
+mod pages;
 use cheatmenu::CheatMenu;
 
 #[no_mangle]

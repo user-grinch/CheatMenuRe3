@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 
-use crate::module::memory::{get_symbol_addr, read_mem};
+use crate::modules::memory::{get_symbol_addr, read_mem};
 
 use super::vector::CVector;
 

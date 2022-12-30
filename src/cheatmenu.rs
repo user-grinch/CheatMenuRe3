@@ -5,10 +5,10 @@ use simplelog::*;
 use std::{fs::File};
 use log::info;
 use chrono::Datelike;
-use crate::{page::*, sdk::playerinfo::CPlayerInfo};
+use crate::{pages::*, sdk::playerinfo::CPlayerInfo};
 
-use crate::module::widgets::{calc_size};
-use crate::module::memory::{get_symbol_addr, write_mem, read_mem};
+use crate::modules::widgets::{calc_size};
+use crate::modules::memory::{get_symbol_addr, write_mem, read_mem};
 const VERSION_TITLE :&str = "Cheat Menu v0.1-alpha";
 const LOG_NAME :&str = "CheatMenuRe3.log";
 
@@ -20,7 +20,7 @@ pub struct PageInfo {
 pub struct CheatMenu
 {
     visible : bool,
-    page_list : [&'static PageInfo; 3],
+    page_list : [&'static PageInfo; 6],
     page_selected : &'static PageInfo,
 }
 
@@ -37,7 +37,10 @@ impl CheatMenu {
 
         return CheatMenu { 
             visible: false, 
-            page_list: [teleport::get(), player::get(), menu::get()],
+            page_list: [
+                teleport::get(), player::get(), weapon::get(), 
+                vehicle::get(), game::get(), menu::get()
+                ],
             page_selected : welcome::get(),
         }
     }
